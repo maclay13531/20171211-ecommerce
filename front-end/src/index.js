@@ -10,7 +10,7 @@ import { createStore, applyMiddleware} from 'redux';
 import RootReducer from './reducers/RootReducer';
 // we are going to need AJAX a lot. We will use it in our
 // redux actions which means... we need redux-promise.
-import reduxPromise from 'redux-promise';
+import reduxPromise from 'redux-promise';   // <--    MIDDLEWARE
 
 // we have set up redux. Now we need a way to tell REACT about it.
 // PROVIDER!
