@@ -17,7 +17,7 @@ import reduxPromise from 'redux-promise';   // <--    MIDDLEWARE
 import { Provider } from 'react-redux';
 
 // create the store... the ugly way
-// const theStore = applyMiddleware(reduxPromise)(createStore)(RootReducer);
+// const theStore = applyMiddleware(reduxPromise)(createStore)(RootReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 // the friendly way
 const middleWare = applyMiddleware(reduxPromise);
 const storeWithMid = middleWare(createStore);

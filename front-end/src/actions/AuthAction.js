@@ -3,13 +3,13 @@
 
 import axios from 'axios';
 
-export default function(name){
+export default function(formData){
 	console.log("Auth action is running");
-	console.log(name);
+	console.log(formData);
 	var axiosPromise = axios({
 		url: `${window.apiHost}/register`,
 		method: "POST",
-		data: name
+		data: formData
 	})
 	// our redux-promise middleware will kick in
 	// because the payload value is a promise
