@@ -17,6 +17,20 @@ class Login extends Component{
    		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
+	componentWillReceiveProps(newProps){
+		if(newProps.auth.msg === "wrongPassword"){
+			this.setState({
+				error: "This password does not match"
+			})
+		}else if(newProps.auth.msg === "badUser"){
+			this.setState({
+				error: "THIS do not have an account for this email address"
+			})
+		}else if(newProps.auth.msg === 'loginSuccess'){
+			newProps.history.push('/');
+		}
+	}
+
 	handleSubmit(event){
 		event.preventDefault();
 		console.log("handleSubmit running");
@@ -42,6 +56,7 @@ class Login extends Component{
 	}
 
 	render(){
+		console.log(this.props.auth);
         return(
             <div className="register-wrapper">
                 <h1 className="text-danger">{this.state.error}</h1>
@@ -88,4 +103,4 @@ function mapDispatchToProps(dispatch){
 }
 
 // export default Login
-export default connect(mapDispatchToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

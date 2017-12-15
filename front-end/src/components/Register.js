@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 // we need bindActionCreators so that we can correlate an action to dispatcher.
 // It's down below inside of mapDispatchToProps
 import { bindActionCreators } from 'redux';
-import AuthAction from '../actions/AuthAction'
+import AuthAction from '../actions/AuthAction';
 
 class Register extends Component{
 	constructor(){

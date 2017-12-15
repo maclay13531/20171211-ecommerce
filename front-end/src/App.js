@@ -6,8 +6,9 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import NavBar from './NavBar';
 import SlickSlider from './components/SlickSlider';
 import Register from './components/Register';
-import Home from './components/Home'
-import Login from './components/Login'
+import Home from './components/Home';
+import Login from './components/Login';
+import ProductLines from './components/ProductLines';
 
 class App extends Component {
   render() {
@@ -21,6 +22,7 @@ class App extends Component {
               <Route exact path='/' component={Home} />
               <Route exact path='/register' component={Register} />
               <Route exact path='/login' component={Login} />
+              <Route path='/shop/:productLine' component={ProductLines} />
             </div>
           </div>
         </div>

@@ -13,7 +13,48 @@ var randToken = require('rand-token');
 
 router.post('/login', (req,res,next)=>{
 	console.log(req.body);
-	res.json(req.body);
+	const email = req.body.email;
+	const password = req.body.password;
+
+	const checkLoginQuery = `SELECT * FROM users 
+		INNER JOIN customers ON users.cid = customers.customerNumber
+		WHERE users.email = ?;`;
+	connection.query(checkLoginQuery,[email], (error, results)=>{
+		if(error){
+			throw error;
+		}
+		if(results.length === 0){
+			// this user does not exist
+			res.json({
+				msg: "badUser"
+			})
+		}else{
+			// this email is in the database so check the pass now
+			const checkHash = bcrypt.compareSync(password, results[0].password);
+			const name = results[0].customerName;
+			if(checkHash){
+				// your pass and database pass match
+				// create a new token.
+				// update their row in the DB with the new token
+				// then send some json back to react/ajax/axios
+				const newToken = randToken.uid(100);
+				const updateToken = `UPDATE users SET token = ?
+					WHERE email = ?`
+				connection.query(updateToken, [newToken, email],(error, results)=>{
+					res.json({
+						msg: "loginSuccess",
+						token: newToken,
+						name: name
+					})
+				})
+			}else{
+				// email exist but the pass does not match
+				res.json({
+					msg: "wrongPassword"
+				})
+			}
+		}
+	})
 });
 
 
@@ -110,6 +151,74 @@ router.post('/register', (req,res,next)=>{
 		}
 	)
 })
+
+router.get('/productlines/get',(req,res,next)=>{
+	const selectQuery = `SELECT * FROM productlines`;
+	connection.query(selectQuery,(error,results)=>{
+		if(error){
+			throw error
+		}else{
+			res.json(results);
+		}
+	})
+})
+
+router.get('/productlines/:productline/get', (req, res, next)=>{
+	const pl = req.params.productline
+	var plQuery = `SELECT * FROM productlines
+        INNER JOIN products ON productlines.productLine = products.productLine
+        WHERE productlines.productLine = ?`
+    connection.query(plQuery, [pl], (error, results)=>{
+    	if(error){
+    		throw error
+    	}else{
+    		res.json(results);
+    	}
+    })
+});
+
+router.post('./updateCart', (req, res, next)=>{
+	const productCode = req.body.productCode;
+	const userToken = req.body.userToken;
+	// first... is this even a valid token
+	const getUidQuery = `SELECT id from users WHERE token = ?;`;
+	connection.query(getUidQuery,[userToken],(error, results)=>{
+		if(error){
+			throw error;
+		}else if(results.length === 0){
+			// this token is bad.
+			res.json({
+				msg: "bad token"
+			});
+		}else{
+			const uid = results[0].id;
+			// this is a good token. we know who you are
+			const addToCartQuery = `INSERT into cart (uid, productCode)
+				VALUES (?,?);`;
+			connection.query(addToCartQuery,[uid, productCode],(error,results)=>{
+				if(error){
+					throw error;
+				}else{
+					// the insert worked
+					// get the sum of their products and their total
+					const getCartTotals = `SELECT SUM(buyPrice) as totalPrice, count(buyPrice) as totalItems FROM cart
+						INNER JOIN products ON products.productCode = cart.productCode
+						WHERE cart.uid = ?`
+					connection.query(getCartTotals,[uid],(error,cartResults)=>{
+						if(error){
+							throw error;
+						}else{
+							res.json(cartResults);
+						}
+					})
+				}
+			})
+		}
+	})
+});
+
+
+
 
 
 module.exports = router;
